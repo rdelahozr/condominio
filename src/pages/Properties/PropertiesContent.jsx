@@ -28,67 +28,53 @@ const PropertiesContent = () => {
   const [rows, setRows] = useState([
     {
       'id': 1,
-      'name': "La Plaza",
-      'province': "Independencia",
-      'rut': "22.333.444-5",
-      'properties': 170,
-      'parkings': 30,
-      'common-places': 6,
+      'type': "Estacionamiento",
+      'number': "22",
+      'size': "6m2",
     },
     {
       'id': 2,
-      'name': "Edificio Conecta",
-      'province': "Providencia",
-      'rut': "22.123.444-5",
-      'properties': 243,
-      'parkings': 22,
-      'common-places': 2,
+      'type': "Departamento",
+      'number': "201",
+      'size': "22m2",
     },
     {
       'id': 3,
-      'name': "Colonos",
-      'province': "Providencia",
-      'rut': "18.123.345-5",
-      'properties': 333,
-      'parkings': 22,
-      'common-places': 20,
+      'type': "Departamento",
+      'number': "301",
+      'size': "32m2",
     },
     {
       'id': 4,
-      'name': "Talaveras 72",
-      'province': "Ñuñoa",
-      'rut': "22.444.555-5",
-      'properties': 234,
-      'parkings': 100,
-      'common-places': 30,
+      'type': "Departamento",
+      'number': "401",
+      'size': "42m2",
     },
     {
       'id': 5,
-      'name': "Plaza Hotel",
-      'province': "Santiago",
-      'rut': "22.333.444-5",
-      'properties': 50,
-      'parkings': 20,
-      'common-places': 3,
+      'type': "Estacionamiento",
+      'number': "23",
+      'size': "4m2",
     },
     {
       'id': 6,
-      'name': "La Plaza 2",
-      'province': "Independencia",
-      'rut': "22.333.444-5",
-      'properties': 100,
-      'parkings': 30,
-      'common-places': 6,
+      'type': "Estacionamiento",
+      'number': "24",
+      'size': "6m2",
     },
+    {
+      'id': 7,
+      'type': "Estacionamiento",
+      'number': "25",
+      'size': "6m2",
+    },
+
   ]);
 
   const columns = [
-    { field: 'name', headerName: 'Nombre', width: 200, editable: true },
-    { field: 'province', headerName: 'Comuna', width: 130, editable: true },
-    { field: 'rut', headerName: 'Rut', width: 130, editable: true },
-    { field: 'properties', headerName: 'Propiedades', width: 130, editable: true },
-    { field: 'parkings', headerName: 'Estacionamientos', width: 130, editable: true },
-    { field: 'common-places', headerName: 'Áreas Comunes', width: 130, editable: true },
+    { field: 'type', headerName: 'Tipo', width: 200, editable: true },
+    { field: 'number', headerName: 'Número', width: 130, editable: true },
+    { field: 'size', headerName: 'Tamaño', width: 130, editable: true },
     {
       field: "delete",
       width: 75,
@@ -129,38 +115,35 @@ const PropertiesContent = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2" marginBottom={2}>
-            Datos del condominio
+            Datos de la propiedad
           </Typography>
           <Grid direction="row">
             <Grid item xs={12} marginBottom={2}>
               <TextField
                 required
                 id="outlined-required"
-                label="Rut"
-                placeholder="Ingrese rut"
+                label="Tipo"
+                placeholder="Ingrese tipo"
               />
             </Grid>
             <Grid item xs={12} marginBottom={2}>
               <TextField
                 required
                 id="outlined-required"
-                label="Nombre"
-                placeholder="Ingrese nombre"
+                label="Número"
+                placeholder="Ingrese número"
               /></Grid>
             <Grid item xs={12} marginBottom={2}>
               <TextField
                 required
                 id="outlined-required"
-                label="Dirección"
-                placeholder="Ingrese dirección"
-              /></Grid>
-            <Grid item xs={12} marginBottom={2}>
-              <TextField
-                required
-                id="outlined-required"
-                label="Comuna"
-                placeholder="Ingrese comuna"
+                label="M2"
+                placeholder="Ingrese M2"
               />
+            </Grid>
+            <Grid item xs={12} marginBottom={2}>
+              <Button variant="contained">Guardar</Button>
+              <Button variant="text">Cancelar</Button>
             </Grid>
           </Grid>
         </Box>
