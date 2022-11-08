@@ -128,7 +128,7 @@ const CondominiumContent = () => {
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2"  marginBottom={2}>
+          <Typography id="modal-modal-title" variant="h6" component="h2" marginBottom={2}>
             Datos del condominio
           </Typography>
           <Grid direction="row">
@@ -139,24 +139,28 @@ const CondominiumContent = () => {
               placeholder="Ingrese rut"
             />
             </Grid>
-            <Grid item xs={12}  marginBottom={2}> <TextField
+            <Grid item xs={12} marginBottom={2}> <TextField
               required
               id="outlined-required"
               label="Nombre"
               placeholder="Ingrese nombre"
             /></Grid>
-            <Grid item xs={12}  marginBottom={2}> <TextField
+            <Grid item xs={12} marginBottom={2}> <TextField
               required
               id="outlined-required"
               label="Dirección"
               placeholder="Ingrese dirección"
             /></Grid>
-            <Grid item xs={12}  marginBottom={2}><TextField
+            <Grid item xs={12} marginBottom={2}><TextField
               required
               id="outlined-required"
               label="Comuna"
               placeholder="Ingrese comuna"
             /></Grid>
+            <Grid item xs={12} marginBottom={2}>
+              <Button variant="contained">Guardar</Button>
+              <Button variant="text">Cancelar</Button>
+            </Grid>
           </Grid>
         </Box>
       </Modal>

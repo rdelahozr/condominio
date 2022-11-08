@@ -160,7 +160,8 @@ const PropertiesContent = () => {
                 id="outlined-required"
                 label="Comuna"
                 placeholder="Ingrese comuna"
-              /></Grid>
+              />
+            </Grid>
           </Grid>
         </Box>
       </Modal>
@@ -168,7 +169,7 @@ const PropertiesContent = () => {
       <Grid xs={12}>
         <Typography variant="h6" marginBottom={2}>Seleccione un condominio</Typography>
         <FormControl sx={{ width: 300, marginBottom: "32px", marginRight: "16px" }} >
-          <InputLabel id="demo-simple-select-label">Age</InputLabel>
+          <InputLabel id="demo-simple-select-label">Condominio</InputLabel>
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
