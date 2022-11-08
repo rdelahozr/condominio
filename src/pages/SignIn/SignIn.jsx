@@ -7,20 +7,17 @@ import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-
-
+import { useNavigate } from 'react-router-dom';
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="https://www.google.cl/">
+        Gestión inmobiliaria Spa
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -32,6 +29,8 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
+  const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -39,6 +38,7 @@ export default function SignIn() {
       email: data.get('email'),
       password: data.get('password'),
     });
+    navigate('/inicio');
   };
 
   return (
@@ -53,12 +53,15 @@ export default function SignIn() {
             alignItems: 'center',
           }}
         >
-          <img 
-            src="logo-condominio.png" 
-            sx={{ width: 100, height: 100 }}>        
+          <img
+            src="logo-condominio.png"
+            sx={{ width: 100, height: 100 }}
+            alt="logo-condominio"
+          >
+
           </img>
           <Typography component="h1" variant="h5">
-            
+
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -85,15 +88,15 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Recuerdame"
             />
-            <Button              
+            <Button
               type="submit"
-              fullWidth                      
+              fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
               Log In
             </Button>
-              <Grid container>
+            <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
                   Olvidaste tu Contraseña?
