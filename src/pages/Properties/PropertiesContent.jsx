@@ -1,9 +1,11 @@
 import { Box, Breadcrumbs, Button, FormControl, Grid, IconButton, InputLabel, MenuItem, Modal, Paper, Select, TextField, Typography } from "@mui/material"
 import { Container } from "@mui/system"
 import { DataGrid } from "@mui/x-data-grid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DeleteIcon from '@mui/icons-material/Delete';
+import { getCondominium } from "../../api/condominium";
+import { addProperties, deleteProperties, getPropertiesByCondominium } from "../../api/properties";
 
 const style = {
   position: 'absolute',
@@ -25,51 +27,53 @@ const PropertiesContent = () => {
   const [selectionModel, setSelectionModel] = useState([]);
   const [selected, setSelected] = useState();
 
-  const [rows, setRows] = useState([
-    {
-      'id': 1,
-      'type': "Estacionamiento",
-      'number': "22",
-      'size': "6m2",
-    },
-    {
-      'id': 2,
-      'type': "Departamento",
-      'number': "201",
-      'size': "22m2",
-    },
-    {
-      'id': 3,
-      'type': "Departamento",
-      'number': "301",
-      'size': "32m2",
-    },
-    {
-      'id': 4,
-      'type': "Departamento",
-      'number': "401",
-      'size': "42m2",
-    },
-    {
-      'id': 5,
-      'type': "Estacionamiento",
-      'number': "23",
-      'size': "4m2",
-    },
-    {
-      'id': 6,
-      'type': "Estacionamiento",
-      'number': "24",
-      'size': "6m2",
-    },
-    {
-      'id': 7,
-      'type': "Estacionamiento",
-      'number': "25",
-      'size': "6m2",
-    },
+  const [rows, setRows] = useState([]);
 
-  ]);
+  const newProperty = {
+    type: '',
+    number: '',
+    size: '',
+    condominiumn: ''
+  }
+
+  const [newPropertyData, setNewPropertyData] = useState({
+    ...newProperty
+  });
+
+  const [condominiums, setCondominiums] = useState([]);
+
+  const handleAddProperty = async () => {
+    const response = await addProperties(newPropertyData);
+    if (response.status === 200) {
+      setNewPropertyData({ ...newProperty, condominiumn: selected })
+      getPropertiesByCondominium(selected)
+        .then(response => setRows(response.data.map(item => ({
+          ...item,
+          id: item._id
+        }))))
+    }
+    handleClose();
+  }
+
+  const handleDeleteProperty = async (ids) => {
+    const response = await deleteProperties(ids);
+  }
+
+
+  useEffect(() => {
+    getCondominium()
+      .then(response => setCondominiums(response.data))
+  }, []);
+
+  useEffect(() => {
+    if (selected) {
+      getPropertiesByCondominium(selected)
+        .then(response => setRows(response.data.map(item => ({
+          ...item,
+          id: item._id
+        }))))
+    }
+  }, [selected])
 
   const columns = [
     { field: 'type', headerName: 'Tipo', width: 200, editable: true },
@@ -85,9 +89,7 @@ const PropertiesContent = () => {
           <IconButton
             onClick={() => {
               const selectedIDs = new Set(selectionModel);
-              // you can call an API to delete the selected IDs
-              // and get the latest results after the deletion
-              // then call setRows() to update the data locally here
+              handleDeleteProperty(Array.from(selectedIDs));
               setRows((r) => r.filter((x) => !selectedIDs.has(x.id)));
             }}
           >
@@ -124,6 +126,8 @@ const PropertiesContent = () => {
                 id="outlined-required"
                 label="Tipo"
                 placeholder="Ingrese tipo"
+                value={newPropertyData.type}
+                onChange={(e) => setNewPropertyData(prev => ({ ...prev, type: e.target.value }))}
               />
             </Grid>
             <Grid item xs={12} marginBottom={2}>
@@ -132,6 +136,8 @@ const PropertiesContent = () => {
                 id="outlined-required"
                 label="Número"
                 placeholder="Ingrese número"
+                value={newPropertyData.number}
+                onChange={(e) => setNewPropertyData(prev => ({ ...prev, number: Number(e.target.value) }))}
               /></Grid>
             <Grid item xs={12} marginBottom={2}>
               <TextField
@@ -139,11 +145,13 @@ const PropertiesContent = () => {
                 id="outlined-required"
                 label="M2"
                 placeholder="Ingrese M2"
+                value={newPropertyData.size}
+                onChange={(e) => setNewPropertyData(prev => ({ ...prev, size: Number(e.target.value) }))}
               />
             </Grid>
             <Grid item xs={12} marginBottom={2}>
-              <Button variant="contained">Guardar</Button>
-              <Button variant="text">Cancelar</Button>
+              <Button variant="contained" onClick={handleAddProperty}>Guardar</Button>
+              <Button variant="text" onClick={handleClose}>Cancelar</Button>
             </Grid>
           </Grid>
         </Box>
@@ -156,16 +164,20 @@ const PropertiesContent = () => {
           <Select
             labelId="demo-simple-select-label"
             id="demo-simple-select"
+            MenuProps={{
+              style: {
+                maxHeight: 300,
+              },
+            }}
             value={selected}
             label="Condominio"
-            onChange={(e) => setSelected(e.target.value)}
+            onChange={(e) => {
+              setSelected(e.target.value)
+              setNewPropertyData(prev => ({ ...prev, condominiumn: e.target.value }))
+            }}
           >
-            <MenuItem value={1}>La Plaza</MenuItem>
-            <MenuItem value={2}>Edificio Conecta</MenuItem>
-            <MenuItem value={3}>Colonos</MenuItem>
-            <MenuItem value={4}>Talaveras 72</MenuItem>
-            <MenuItem value={5}>Plaza Hotel</MenuItem>
-            <MenuItem value={6}>La Plaza 2</MenuItem>
+
+            {condominiums.length > 0 && condominiums.map(item => (<MenuItem value={item._id}>{item.name}</MenuItem>))}
           </Select>
         </FormControl>
       </Grid>

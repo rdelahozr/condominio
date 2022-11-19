@@ -1,9 +1,10 @@
-import { Breadcrumbs, Button, Grid, IconButton, Modal, TextField, Typography } from "@mui/material"
+import { Breadcrumbs, Button, Grid, IconButton, Modal, TableCell, TableContainer, TextField, Typography } from "@mui/material"
 import { Box, Container } from "@mui/system"
 import { DataGrid } from "@mui/x-data-grid";
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Link } from "react-router-dom";
+import { addCondominium, deleteCondominiums, getCondominium } from "../../api/condominium";
 
 const style = {
   position: 'absolute',
@@ -22,64 +23,47 @@ const CondominiumContent = () => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [rows, setRows] = useState([
-    {
-      'id': 1,
-      'name': "La Plaza",
-      'province': "Independencia",
-      'rut': "22.333.444-5",
-      'properties': 170,
-      'parkings': 30,
-      'common-places': 6,
-    },
-    {
-      'id': 2,
-      'name': "Edificio Conecta",
-      'province': "Providencia",
-      'rut': "22.123.444-5",
-      'properties': 243,
-      'parkings': 22,
-      'common-places': 2,
-    },
-    {
-      'id': 3,
-      'name': "Colonos",
-      'province': "Providencia",
-      'rut': "18.123.345-5",
-      'properties': 333,
-      'parkings': 22,
-      'common-places': 20,
-    },
-    {
-      'id': 4,
-      'name': "Talaveras 72",
-      'province': "Ñuñoa",
-      'rut': "22.444.555-5",
-      'properties': 234,
-      'parkings': 100,
-      'common-places': 30,
-    },
-    {
-      'id': 5,
-      'name': "Plaza Hotel",
-      'province': "Santiago",
-      'rut': "22.333.444-5",
-      'properties': 50,
-      'parkings': 20,
-      'common-places': 3,
-    },
-    {
-      'id': 6,
-      'name': "La Plaza 2",
-      'province': "Independencia",
-      'rut': "22.333.444-5",
-      'properties': 100,
-      'parkings': 30,
-      'common-places': 6,
-    },
-  ]);
+
+  // cargarlos desde la api
+  const [rows, setRows] = useState([]);
+
+  const newCondominium = {
+    rut: '',
+    name: '',
+    address: '',
+    province: '',
+    properties: 0,
+    parkings: 0,
+    commonPlaces: 0,
+  }
+
   const [selectionModel, setSelectionModel] = useState([]);
+
+  const [newCondominiumData, setNewCondimiumData] = useState({
+    ...newCondominium
+  });
+
+  const [addCondominiumResponse, setAddCondominiumResponse] = useState();
+
+  const handleAddCondominium = async () => {
+    const response = await addCondominium(newCondominiumData);
+    setAddCondominiumResponse(response);
+    setNewCondimiumData({ ...newCondominium })
+    handleClose();
+  }
+
+  const handleRemoveCondominium = async (ids) => {
+    console.log(ids);
+    const response = await deleteCondominiums(ids)
+  }
+
+  useEffect(() => {
+    console.log(addCondominiumResponse);
+    getCondominium()
+      .then(response => setRows(response.data.map(item => (
+        { ...item, id: item._id }
+      ))))
+  }, [addCondominiumResponse]);
 
   const columns = [
     { field: 'name', headerName: 'Nombre', width: 200, editable: true },
@@ -87,7 +71,7 @@ const CondominiumContent = () => {
     { field: 'rut', headerName: 'Rut', width: 130, editable: true },
     { field: 'properties', headerName: 'Propiedades', width: 130, editable: true },
     { field: 'parkings', headerName: 'Estacionamientos', width: 130, editable: true },
-    { field: 'common-places', headerName: 'Áreas Comunes', width: 130, editable: true },
+    { field: 'commonPlaces', headerName: 'Áreas Comunes', width: 130, editable: true },
     {
       field: "delete",
       width: 75,
@@ -98,9 +82,7 @@ const CondominiumContent = () => {
           <IconButton
             onClick={() => {
               const selectedIDs = new Set(selectionModel);
-              // you can call an API to delete the selected IDs
-              // and get the latest results after the deletion
-              // then call setRows() to update the data locally here
+              handleRemoveCondominium(Array.from(selectedIDs));
               setRows((r) => r.filter((x) => !selectedIDs.has(x.id)));
             }}
           >
@@ -132,34 +114,57 @@ const CondominiumContent = () => {
             Datos del condominio
           </Typography>
           <Grid direction="row">
-            <Grid item xs={12} marginBottom={2}><TextField
-              required
-              id="outlined-required"
-              label="Rut"
-              placeholder="Ingrese rut"
-            />
-            </Grid>
-            <Grid item xs={12} marginBottom={2}> <TextField
-              required
-              id="outlined-required"
-              label="Nombre"
-              placeholder="Ingrese nombre"
-            /></Grid>
-            <Grid item xs={12} marginBottom={2}> <TextField
-              required
-              id="outlined-required"
-              label="Dirección"
-              placeholder="Ingrese dirección"
-            /></Grid>
-            <Grid item xs={12} marginBottom={2}><TextField
-              required
-              id="outlined-required"
-              label="Comuna"
-              placeholder="Ingrese comuna"
-            /></Grid>
             <Grid item xs={12} marginBottom={2}>
-              <Button variant="contained">Guardar</Button>
-              <Button variant="text">Cancelar</Button>
+              <TextField
+                required
+                id="outlined-required"
+                label="Rut"
+                placeholder="Ingrese rut"
+                value={newCondominiumData.rut}
+                onChange={(e) => setNewCondimiumData(prev => ({ ...prev, rut: e.target.value }))}
+              />
+            </Grid>
+            <Grid item xs={12} marginBottom={2}>
+              <TextField
+                required
+                id="outlined-required"
+                label="Nombre"
+                placeholder="Ingrese nombre"
+                value={newCondominiumData.name}
+                onChange={(e) => setNewCondimiumData(prev => ({ ...prev, name: e.target.value }))}
+              /></Grid>
+            <Grid item xs={12} marginBottom={2}>
+              <TextField
+                required
+                id="outlined-required"
+                label="Dirección"
+                placeholder="Ingrese dirección"
+                value={newCondominiumData.address}
+                onChange={(e) => setNewCondimiumData(prev => ({ ...prev, address: e.target.value }))}
+              /></Grid>
+            <Grid item xs={12} marginBottom={2}>
+              <TextField
+                required
+                id="outlined-required"
+                label="Comuna"
+                placeholder="Ingrese comuna"
+                value={newCondominiumData.province}
+                onChange={(e) => setNewCondimiumData(prev => ({ ...prev, province: e.target.value }))}
+              />
+            </Grid>
+            <Grid item xs={12} marginBottom={2}>
+              <TextField
+                required
+                id="outlined-required"
+                label="Propiedades"
+                placeholder="Ingrese número de propiedades"
+                value={newCondominiumData.properties}
+                onChange={(e) => setNewCondimiumData(prev => ({ ...prev, properties: e.target.value }))}
+              />
+            </Grid>
+            <Grid item xs={12} marginBottom={2}>
+              <Button variant="contained" onClick={handleAddCondominium}>Guardar</Button>
+              <Button variant="text" onClick={handleClose}>Cancelar</Button>
             </Grid>
           </Grid>
         </Box>
