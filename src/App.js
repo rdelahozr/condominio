@@ -13,20 +13,28 @@ import Properties from "./pages/Properties/Properties";
 import Owners from "./pages/Owners/Owners";
 import CommonPlaces from "./pages/CommonPlaces/CommonPlaces";
 import Users from "./pages/Users/Users";
+import { UserContextProvider, useUserContext } from "./context/userContext";
+import PrivateRoute from "./common/PrivateRoute";
+import Reservations from "./pages/Reservation/Reservation";
 
 
 function App() {
+
   return (
-    <Routes>
-      <Route path="/login" element={<SignIn />} />
-      <Route path="/inicio" element={<MainPage />} />
-      <Route path="/condominio" element={<Condominium />} />
-      <Route path="/propiedades" element={<Properties />} />
-      <Route path="/propietarios" element={<Owners />} />
-      <Route path="/gastos-comunes" element={<CommonExpenses />} />
-      <Route path="/espacios-comunes" element={<CommonPlaces />} />
-      <Route path="/usuarios" element={<Users />} />
-    </Routes>
+    <UserContextProvider>
+      <Routes>
+        <Route path="/" element={<PrivateRoute><MainPage /></PrivateRoute>} />
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/condominios" element={<PrivateRoute><Condominium /></PrivateRoute>} />
+        <Route path="/propiedades" element={<PrivateRoute><Properties /></PrivateRoute>} />
+        <Route path="/propietarios" element={<PrivateRoute><Owners /></PrivateRoute>} />
+        <Route path="/gastos-comunes" element={<PrivateRoute><CommonExpenses /></PrivateRoute>} />
+        <Route path="/espacios-comunes" element={<PrivateRoute><CommonPlaces /></PrivateRoute>} />
+        <Route path="/reservas" element={<PrivateRoute><Reservations /></PrivateRoute>} />
+        <Route path="/usuarios" element={<PrivateRoute><Users /></PrivateRoute>} />
+      </Routes>
+    </UserContextProvider>
+
   );
 }
 export default App;

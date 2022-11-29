@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { useUserContext } from '../../context/userContext';
+import { login } from '../../api/users';
 
 function Copyright(props) {
   return (
@@ -29,16 +31,22 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
+  const {setUser} = useUserContext();
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
+    const response = await login({
       email: data.get('email'),
       password: data.get('password'),
-    });
-    navigate('/inicio');
+    })
+    setUser({
+      name: response.data.name,
+      condominium: response.data.condominium,
+      role: response.data.role
+    })
+    navigate('/');
   };
 
   return (

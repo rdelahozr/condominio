@@ -33,7 +33,7 @@ const PropertiesContent = () => {
     type: '',
     number: '',
     size: '',
-    condominiumn: ''
+    condominium: ''
   }
 
   const [newPropertyData, setNewPropertyData] = useState({
@@ -45,7 +45,7 @@ const PropertiesContent = () => {
   const handleAddProperty = async () => {
     const response = await addProperties(newPropertyData);
     if (response.status === 200) {
-      setNewPropertyData({ ...newProperty, condominiumn: selected })
+      setNewPropertyData({ ...newProperty, condominium: selected })
       getPropertiesByCondominium(selected)
         .then(response => setRows(response.data.map(item => ({
           ...item,
@@ -78,7 +78,13 @@ const PropertiesContent = () => {
   const columns = [
     { field: 'type', headerName: 'Tipo', width: 200, editable: true },
     { field: 'number', headerName: 'Número', width: 130, editable: true },
-    { field: 'size', headerName: 'Tamaño', width: 130, editable: true },
+    {
+      field: 'size',
+      headerName: 'Tamaño',
+      width: 130,
+      editable: true,
+      valueFormatter: ({ value }) => (`${value} m2`)
+    },
     {
       field: "delete",
       width: 75,
@@ -102,13 +108,14 @@ const PropertiesContent = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Breadcrumbs aria-label="breadcrumb" marginBottom={4}>
-        <Link underline="hover" color="inherit" to="/inicio">
+        <Link underline="hover" color="inherit" to="/">
           Inicio
         </Link>
         <Typography color="text.primary">Propiedades</Typography>
       </Breadcrumbs>
 
 
+      <Typography variant="h5" marginBottom={4}>Propiedades</Typography>
       <Modal
         open={open}
         onClose={handleClose}
@@ -173,7 +180,7 @@ const PropertiesContent = () => {
             label="Condominio"
             onChange={(e) => {
               setSelected(e.target.value)
-              setNewPropertyData(prev => ({ ...prev, condominiumn: e.target.value }))
+              setNewPropertyData(prev => ({ ...prev, condominium: e.target.value }))
             }}
           >
 

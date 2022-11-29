@@ -14,7 +14,8 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems, terciaryListItems } from './listItems';
+import handleNav, { mainListItems, secondaryListItems, terciaryListItems } from './listItems';
+import { useUserContext } from '../../context/userContext';
 
 function Copyright(props) {
   return (
@@ -84,11 +85,15 @@ export default function Dashboard(props) {
     setOpen(!open);
   };
 
+  const {user} = useUserContext();
+
   return (
     <ThemeProvider theme={mdTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
-        <AppBar position="absolute" open={open}  style={{ background: 'transparent' }}>
+        <AppBar position="absolute" open={open} style={{
+          background: 'transparent',
+        }}>
           <Toolbar
             sx={{
               pr: '24px', // keep right padding when drawer closed
@@ -103,7 +108,7 @@ export default function Dashboard(props) {
                 ...(open && { display: 'none' }),
               }}
             >
-              <MenuIcon color='error'/>
+              <MenuIcon color='error' />
             </IconButton>
           </Toolbar>
         </AppBar>
@@ -121,13 +126,7 @@ export default function Dashboard(props) {
             </IconButton>
           </Toolbar>
           <Divider />
-          <List component="nav">
-            {mainListItems}
-            <Divider sx={{ my: 1 }} />
-            {secondaryListItems}
-            <Divider sx={{ my: 1 }} />
-            {terciaryListItems}
-          </List>
+          {user?.role && handleNav(user?.role)}
         </Drawer>
         <Box
           component="main"

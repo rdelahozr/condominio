@@ -2,7 +2,9 @@ import { Box, Breadcrumbs, Button, FormControl, Grid, InputLabel, MenuItem, Moda
 import { Container } from "@mui/system"
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getCommonPlacesByCondominium } from "../../api/commonPlaces";
 import { getCondominium } from "../../api/condominium";
+import { addReservation, getReservationsByCondominium } from "../../api/reservations";
 import { addUser, getUsers } from "../../api/users";
 import { useUserContext } from "../../context/userContext";
 import { roles } from "../../utils/helpers";
@@ -20,21 +22,17 @@ const style = {
   p: 4,
 };
 
-const UsersContent = () => {
+const ReservationContent = () => {
   const { user } = useUserContext();
-  const [selected, setSelected] = useState(user?.role !== roles.SUPER_ADMIN ? user?.condominium : null);
-  const [condominiums, setCondominiums] = useState([]);
   const [users, setUsers] = useState();
+  const [places, setPlaces] = useState();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const newUser = {
-    name: '',
-    role: '',
-    email: '',
-    username: '',
-    password: '',
-    condominium: ''
+    place: '',
+    condominium: user.condominium,
+    date: ''
   }
 
   const [newUserData, setNewUserData] = useState({
@@ -42,22 +40,27 @@ const UsersContent = () => {
   });
 
   useEffect(() => {
-    console.log({ user })
-    getCondominium()
-      .then(response => setCondominiums(response.data))
-  }, []);
+
+    if (user.condominium) {
+      getCommonPlacesByCondominium(user.condominium)
+        .then(response => setPlaces(response.data.map(item => ({
+          ...item,
+          id: item._id
+        }))))
+    }
+  }, [user.condominium])
 
   useEffect(() => {
-    getUsers(selected)
+    getReservationsByCondominium(user.condominium)
       .then(response => setUsers(response.data))
-  }, [selected]);
+  }, [user.condominium]);
 
   const handleAddUser = async () => {
-    const response = await addUser({
+    const response = await addReservation({
       ...newUserData,
-      condominium: selected
+      condominium: user.condominium
     });
-    getUsers(selected)
+    getReservationsByCondominium(user.condominium)
       .then(response => setUsers(response.data))
     handleClose();
   }
@@ -72,68 +75,38 @@ const UsersContent = () => {
       >
         <Box sx={style}>
           <Typography id="modal-modal-title" variant="h6" component="h2" marginBottom={2}>
-            Datos del usuario
+            Datos de la reserva
           </Typography>
           <Grid direction="row">
             <Grid item xs={12} marginBottom={2}>
               <TextField
                 required
                 id="outlined-required"
-                label="Nombre"
-                placeholder="Ingrese Nombre"
-                value={newUserData.name}
-                onChange={(e) => setNewUserData(prev => ({ ...prev, name: e.target.value }))}
-              />
-            </Grid>
-            <Grid item xs={12} marginBottom={2}>
-              <TextField
-                required
-                id="outlined-required"
-                label="Email"
-                placeholder="Ingrese Email"
-                value={newUserData.email}
-                onChange={(e) => setNewUserData(prev => ({ ...prev, email: e.target.value }))}
+                label="Fecha"
+                placeholder="Ingrese Fecha"
+                value={newUserData.date}
+                onChange={(e) => setNewUserData(prev => ({ ...prev, date: e.target.value }))}
               />
             </Grid>
             <Grid item xs={12} marginBottom={2}>
               <FormControl sx={{ width: "200px" }} >
-                <InputLabel id="demo-simple-select-label2">Rol</InputLabel>
+                <InputLabel id="demo-simple-select-label2">Lugar</InputLabel>
                 <Select
                   labelId="demo-simple-select-label2"
                   id="demo-simple-select2"
-                  value={newUserData.role}
-                  label="Rol"
+                  value={newUserData.place}
+                  label="Lugar"
                   onChange={(e) => {
-                    setNewUserData(prev => ({ ...prev, role: e.target.value }))
+                    setNewUserData(prev => ({ ...prev, place: e.target.value }))
                   }}
                 >
 
-                  {user?.role === roles.SUPER_ADMIN ?
-                    Object.values(roles).map(item => (<MenuItem value={item}>{item}</MenuItem>))
-                    : <MenuItem value={roles.RESIDENT}>{roles.RESIDENT}</MenuItem>
+                  {
+                    places && places.map(item => (<MenuItem value={item.name}>{item.name}</MenuItem>))
+
                   }
                 </Select>
               </FormControl>
-            </Grid>
-            <Grid item xs={12} marginBottom={2}>
-              <TextField
-                required
-                id="outlined-required"
-                label="Username"
-                placeholder="Ingrese usuario"
-                value={newUserData.username}
-                onChange={(e) => setNewUserData(prev => ({ ...prev, username: e.target.value }))}
-              />
-            </Grid>
-            <Grid item xs={12} marginBottom={2}>
-              <TextField
-                required
-                id="outlined-required"
-                label="Password"
-                placeholder="Ingrese password"
-                value={newUserData.password}
-                onChange={(e) => setNewUserData(prev => ({ ...prev, password: e.target.value }))}
-              />
             </Grid>
             <Grid item xs={12} marginBottom={2}>
               <Button variant="contained" onClick={handleAddUser}>Guardar</Button>
@@ -146,35 +119,10 @@ const UsersContent = () => {
         <Link underline="hover" color="inherit" to="/">
           Inicio
         </Link>
-        <Typography color="text.primary">Usuarios</Typography>
+        <Typography color="text.primary">Reservas</Typography>
       </Breadcrumbs>
-      <Typography variant="h5" marginBottom={4}>Usuarios</Typography>
-
-      <Grid xs={12}>
-        <Typography variant="h6" marginBottom={2}>Seleccione un condominio</Typography>
-        <FormControl sx={{ width: 300, marginBottom: "32px", marginRight: "16px" }} >
-          <InputLabel id="demo-simple-select-label">Condominio</InputLabel>
-          <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            MenuProps={{
-              style: {
-                maxHeight: 300,
-              },
-            }}
-            value={selected}
-            label="Condominio"
-            onChange={(e) => {
-              setSelected(e.target.value)
-            }}
-            disabled={user?.role !== roles.SUPER_ADMIN}
-          >
-
-            {condominiums.length > 0 && condominiums.map(item => (<MenuItem value={item._id}>{item.name}</MenuItem>))}
-          </Select>
-        </FormControl>
-      </Grid>
-      {selected && <Button variant="contained" sx={{ marginBottom: "16px" }} onClick={handleOpen}>Nuevo</Button>}
+      <Typography variant="h5" marginBottom={4}>Reservas</Typography>
+      <Button variant="contained" sx={{ marginBottom: "16px" }} onClick={handleOpen}>Nuevo</Button>
       <TableContainer component={Paper} marginTop={4}>
         <Table>
           <TableHead>
@@ -205,4 +153,4 @@ const UsersContent = () => {
   )
 }
 
-export default UsersContent;
+export default ReservationContent;

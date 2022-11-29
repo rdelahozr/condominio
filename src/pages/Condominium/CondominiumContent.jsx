@@ -96,7 +96,7 @@ const CondominiumContent = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Breadcrumbs aria-label="breadcrumb" marginBottom={4}>
-        <Link underline="hover" color="inherit" to="/inicio">
+        <Link underline="hover" color="inherit" to="/">
           Inicio
         </Link>
         <Typography color="text.primary">Condominio</Typography>
